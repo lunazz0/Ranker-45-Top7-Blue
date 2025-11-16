@@ -4,7 +4,37 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Ranker - 45 participantes / Top 7 (azul)</title>
-<style>
+<style> 
+  .add-btn {
+  background: #6B7B8D;
+  border: none;
+  color: white;
+  font-size: 18px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.remove-btn {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 26px;
+  height: 26px;
+  background: #ff5757;
+  border-radius: 50%;
+  color: white;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
 :root{
   --primary:#6B7B8D; /* color pedido */
   --accent:#5f6b7a;
@@ -91,53 +121,55 @@ body{margin:0;background:linear-gradient(180deg,#f8fbfe,#fff);color:#222}
 <script>
 const TOTAL = 45;
 const SLOTS = 7;
-let participants = [
-  {id:0,name:'MIMI',agency:'STARKSHIP ENT',year:'2010',image:null},
-  {id:1,name:'RENA',agency:'SM ENT',year:'2006',image:null},
-  {id:2,name:'LALITA',agency:'JYP ENT',year:'2003',image:null},
-  {id:3,name:'AGUSTINA',agency:'CUBE ENT',year:'2006',image:null},
-  {id:4,name:'LUCIA',agency:'BELIFT LAB',year:'2008',image:null},
-  {id:5,name:'RENE',agency:'WM ENT',year:'2004',image:null},
-  {id:6,name:'PATA',agency:'S2 ENT',year:'2004',image:null},
-  {id:7,name:'BRI',agency:'SOURCE MUSIC',year:'2008',image:null},
-  {id:8,name:'JOSI',agency:'SOURCE MUSIC',year:'2008',image:null},
-  {id:9,name:'MENIA',agency:'INDIVIDUAL',year:'2007',image:null},
-  {id:10,name:'LULU',agency:'KQ ENT',year:'2007',image:null},
-  {id:11,name:'ELA',agency:'HIGH UP ENT',year:'2007',image:null},
-  {id:12,name:'LYAH',agency:'STARSHIP ENT',year:'2002',image:null},
-  {id:13,name:'ZOWI',agency:'KOZ ENT',year:'2006',image:null},
-  {id:14,name:'MAI',agency:'BRAND NEW MUSIC',year:'2007',image:null},
-  {id:15,name:'VALENTINA',agency:'KAKAO ENT',year:'2004',image:null},
-  {id:16,name:'ALBA',agency:'YUEHUA ENT',year:'2004',image:null},
-  {id:17,name:'ISI',agency:'HYBE ENT',year:'2006',image:null},
-  {id:18,name:'LELE',agency:'RBW ENT',year:'2006',image:null},
-  {id:19,name:'YHAMI',agency:'IST ENT',year:'2007',image:null},
-  {id:20,name:'AGOS',agency:'TOP MEDIA ENT',year:'2007',image:null},
-  {id:21,name:'LEN',agency:'ADOR ENT',year:'2006',image:null},
-  {id:22,name:'KORY',agency:'PLEDIS ENT',year:'2005',image:null},
-  {id:23,name:'HANI',agency:'FANTAGIO ENT',year:'2006',image:null},
-  {id:24,name:'MATT',agency:'JELLYFISH ENT',year:'2005',image:null},
-  {id:25,name:'LEILA',agency:'DSP MEDIA',year:'2006',image:null},
-  {id:26,name:'COCO',agency:'INDIVIDUAL',year:'2005',image:null},
-  {id:27,name:'JOJO',agency:'HYBE ENT',year:'2004',image:null},
-  {id:28,name:'SARIEL',agency:'143 ENT',year:'2008',image:null},
-  {id:29,name:'KAMI',agency:'KOZ ENT',year:'2009',image:null},
-  {id:30,name:'KAT',agency:'PLAY M ENT',year:'2008',image:null},
-  {id:31,name:'RORO',agency:'8D ENT',year:'2005',image:null},
-  {id:32,name:'MAR',agency:'WOOLLIM ENT',year:'2006',image:null},
-  {id:33,name:'NANA',agency:'J PLANET ENT',year:'2004',image:null},
-  {id:34,name:'ANI',agency:'MNH ENT',year:'2009',image:null},
-  {id:35,name:'REBZ',agency:'LOEN ENT',year:'2007',image:null},
-  {id:36,name:'HACHI',agency:'FANTAGIO ENT',year:'2008',image:null},
-  {id:37,name:'CORI',agency:'8D ENT',year:'2006',image:null},
-  {id:38,name:'NICOLE',agency:'WOOLLIM ENT',year:'2000',image:null},
-  {id:39,name:'JUANA',agency:'MYSTIC STORY',year:'2008',image:null},
-  {id:40,name:'VALI',agency:'TSE ENT',year:'2007',image:null},
-  {id:41,name:'ARI',agency:'POCKETDOL STUDIO',year:'2007',image:null},
-  {id:42,name:'YUDANIS',agency:'ALLIGATOR COMPANY',year:'2006',image:null},
-  {id:43,name:'JOSEFA',agency:'DR MUSIC',year:'2005',image:null},
-  {id:44,name:'VALSI',agency:'CORIDEL ENT',year:'2005',image:null}
+const participants = [
+  { name: "MIMI", agency: "STARKSHIP ENT", year: 2010 },
+  { name: "RENA", agency: "SM ENT", year: 2006 },
+  { name: "LALITA", agency: "JYP ENT", year: 2003 },
+  { name: "AGUSTINA", agency: "CUBE ENT", year: 2006 },
+  { name: "LUCIA", agency: "BELIFT LAB", year: 2008 },
+  { name: "RENE", agency: "WM ENT", year: 2004 },
+  { name: "PATA", agency: "S2 ENT", year: 2004 },
+  { name: "BRI", agency: "SOURCE MUSIC", year: 2008 },
+  { name: "JOSI", agency: "SOURCE MUSIC", year: 2008 },
+  { name: "MENIA", agency: "INDIVIDUAL", year: 2007 },
+  { name: "LULU", agency: "KQ ENT", year: 2007 },
+  { name: "ELA", agency: "HIGH UP ENT", year: 2007 },
+  { name: "LYAH", agency: "STARSHIP ENT", year: 2002 },
+  { name: "ZOWI", agency: "KOZ ENT", year: 2006 },
+  { name: "MAI", agency: "BRAND NEW MUSIC", year: 2007 },
+  { name: "VALENTINA", agency: "KAKAO ENT", year: 2004 },
+  { name: "ALBA", agency: "YUEHUA ENT", year: 2004 },
+  { name: "ISI", agency: "HYBE ENT", year: 2006 },
+  { name: "LELE", agency: "RBW ENT", year: 2006 },
+  { name: "YHAMI", agency: "IST ENT", year: 2007 },
+  { name: "AGOS", agency: "TOP MEDIA ENT", year: 2007 },
+  { name: "LEN", agency: "ADOR ENT", year: 2006 },
+  { name: "KORY", agency: "PLEDIS ENT", year: 2005 },
+  { name: "HANI", agency: "FANTAGIO ENT", year: 2006 },
+  { name: "MATT", agency: "JELLYFISH ENT", year: 2005 },
+  { name: "LEILA", agency: "DSP MEDIA", year: 2006 },
+  { name: "COCO", agency: "INDIVIDUAL", year: 2005 },
+  { name: "JOJO", agency: "HYBE ENT", year: 2004 },
+  { name: "SARIEL", agency: "143 ENT", year: 2008 },
+  { name: "KAMI", agency: "KOZ ENT", year: 2009 },
+  { name: "KAT", agency: "PLAY M ENT", year: 2008 },
+  { name: "RORO", agency: "8D ENT", year: 2005 },
+  { name: "MAR", agency: "WOOLLIM ENT", year: 2006 },
+  { name: "NANA", agency: "J PLANET ENT", year: 2004 },
+  { name: "ANI", agency: "MNH ENT", year: 2009 },
+  { name: "REBZ", agency: "LOEN ENT", year: 2007 },
+  { name: "HACHI", agency: "FANTAGIO ENT", year: 2008 },
+  { name: "CORI", agency: "8D ENT", year: 2006 },
+  { name: "NICOLE", agency: "WOOLLIM ENT", year: 2000 },
+  { name: "JUANA", agency: "MYSTIC STORY", year: 2008 },
+  { name: "VALI", agency: "TSE ENT", year: 2007 },
+  { name: "ARI", agency: "POCKETDOL STUDIO", year: 2007 },
+  { name: "YUDANIS", agency: "ALLIGATOR COMPANY", year: 2006 },
+  { name: "JOSEFA", agency: "DR MUSIC", year: 2005 },
+  { name: "VALSI", agency: "CORIDEL ENT", year: 2005 }
 ];
+<div id="participants-list"></div>
+
 let slots = Array(SLOTS).fill(null);
 
 function defaultSvg(n){
@@ -145,6 +177,7 @@ function defaultSvg(n){
 }
 
 function renderList(filter=''){
+  <button class="add-btn" onclick="addToTop(${p.id})">+</button>
   const list = document.getElementById('list'); list.innerHTML='';
   participants.forEach((p,i)=>{
     const q = (p.name||'').toLowerCase();
@@ -205,7 +238,16 @@ document.getElementById('saveBtn').addEventListener('click',()=>{ saveLocal(); a
 document.getElementById('exportBtn').addEventListener('click',exportJSON);
 document.getElementById('importBtn').addEventListener('click',()=>document.getElementById('importFile').click());
 document.getElementById('importFile').addEventListener('change',(e)=>{ if(e.target.files[0]) importJSONFile(e.target.files[0]); });
+if (p) {
+  slot.innerHTML = `
+    <button class="remove-btn" onclick="removeFromTop(${i})">×</button>
+    <img src="${p.image || 'default.png'}" class="avatar">
+    <div class="slot-name">${p.name}</div>
+    <div class="slot-agency">${p.agency} • ${p.year}</div>
+  `;
+}
 
+  
 // init load local if exists
 (function init(){ const saved = localStorage.getItem('ranker_blue_v1'); if(saved){ try{ const obj = JSON.parse(saved); if(obj.participants) participants = obj.participants.slice(0,TOTAL); if(obj.slots) slots = obj.slots.slice(0,SLOTS); }catch(e){ console.warn('load failed'); } }
  renderList(); renderSlots(); })();
