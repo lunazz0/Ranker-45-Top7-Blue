@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Ranker - 45 participantes / Top 7 (azul)</title>
+<style>
+:root{
+  --primary:#6B7B8D; /* color pedido */
+  --accent:#5f6b7a;
+  --light:#f5f7f9;
+  --muted:#9aa1a6;
+}
+*{box-sizing:border-box;font-family:Inter, 'Helvetica Neue', Arial, sans-serif}
+body{margin:0;background:linear-gradient(180deg,#f8fbfe,#fff);color:#222}
+.header{padding:48px 20px;text-align:center;background:linear-gradient(90deg, rgba(107,123,141,0.08), rgba(107,123,141,0.02));}
+.logo{width:110px;height:110px;border-radius:50%;background:linear-gradient(180deg,var(--primary),#364153);display:inline-block;margin-bottom:10px}
+.title{font-size:22px;letter-spacing:2px;color:var(--primary);font-weight:800}
+.subtitle{color:var(--primary);opacity:0.7;font-size:13px;margin-top:6px}
+.container{display:flex;gap:28px;padding:28px;align-items:flex-start}
+.left{width:360px}
+.search{width:100%;padding:12px;border-radius:8px;border:1px solid #e7eef6;background:#fff;box-shadow:0 2px 0 rgba(0,0,0,0.03);margin-bottom:14px}
+.list{height:640px;overflow:auto;background:#fff;border-radius:10px;padding:12px;border:1px solid #eef3f7}
+.part{display:flex;align-items:center;gap:12px;padding:10px;border-bottom:1px solid #f1f5f8}
+.avatar{width:60px;height:60px;border-radius:50%;background:#f6f8fa;border:6px solid rgba(107,123,141,0.12);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.info{flex:1}
+.name{font-weight:700;color:#26333b}
+.meta{font-size:12px;color:var(--muted);margin-top:4px}
+.drag-handle{width:20px;height:20px;border-radius:6px;background:#f0f4f7;display:flex;align-items:center;justify-content:center;font-size:12px;color:#7a8894;cursor:grab}
+.controls{margin-top:12px}
+.btn{display:inline-block;padding:8px 12px;border-radius:8px;border:none;background:var(--primary);color:#fff;font-weight:700;margin-right:8px;cursor:pointer}
+.small{padding:6px 8px;font-size:13px}
+.deck{flex:1;padding:20px}
+.topTitle{font-weight:900;margin-bottom:6px;color:var(--primary);font-size:18px}
+.topArea{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;align-items:center;justify-items:center}
+.slot{width:130px;height:130px;border-radius:50%;background:#dfe7ee;display:flex;align-items:center;justify-content:center;position:relative;box-shadow:0 6px 18px rgba(43,56,68,0.06)}
+.slot .num{position:absolute;bottom:8px;right:8px;background:#fff;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;border:2px solid rgba(0,0,0,0.06)}
+.slot img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.slotholder{display:flex;gap:16px;justify-content:center;margin-top:18px}
+.bottomRow{display:flex;gap:16px;justify-content:center;margin-top:12px}
+.hint{color:#556470;font-size:13px;margin-top:12px}
+.footer{padding:20px;text-align:center;color:#9aa1a6}
+.uploadInput{display:none}
+.part .name[contenteditable]{outline:none}
+.part .meta[contenteditable]{outline:none}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="logo"></div>
+  <div class="title">SURVIVAL SHOW RANKER</div>
+  <div class="subtitle">Plantilla editable — 45 participantes • Top 7 (azul)</div>
+</div>
+<div class="container">
+  <div class="left">
+    <input class="search" placeholder="Buscar participante..." id="search" />
+    <div class="list" id="list"></div>
+    <div class="controls">
+      <button class="btn small" id="resetBtn">Restablecer</button>
+      <button class="btn small" id="clearImages">Borrar imágenes</button>
+    </div>
+    <div style="margin-top:10px">
+      <button class="btn" id="saveBtn">Guardar (local)</button>
+      <button class="btn" id="exportBtn">Exportar JSON</button>
+      <input type="file" id="importFile" accept="application/json" style="display:none" />
+      <button class="btn" id="importBtn">Importar JSON</button>
+    </div>
+    <div class="hint">Haz clic en un avatar para subir una foto. Arrastra un participante hacia un puesto para asignarlo. Edita nombres y agencia directamente.</div>
+  </div>
+  <div class="deck">
+    <div class="topTitle">TOP 7</div>
+    <div class="topArea" id="topArea">
+      <div style="grid-column:2;display:flex;justify-content:center;"><div class="slot" data-slot="1"></div></div>
+      <div style="grid-column:1;display:flex;justify-content:center;"><div class="slot" data-slot="2"></div></div>
+      <div style="grid-column:2;display:flex;justify-content:center;"><div class="slot" data-slot="3"></div></div>
+      <div style="grid-column:3;display:flex;justify-content:center;"><div class="slot" data-slot="4"></div></div>
+    </div>
+    <div class="slotholder" id="middleRow">
+      <div class="slot" data-slot="5"></div>
+      <div class="slot" data-slot="6"></div>
+      <div class="slot" data-slot="7"></div>
+    </div>
+    <div class="exportarea" id="exportarea"></div>
+  </div>
+</div>
+<div class="footer">Plantilla creada — editable localmente. No sube nada a servidores.</div>
+
+<input type="file" id="imgUpload" accept="image/*" class="uploadInput" />
+
+<script>
+const TOTAL = 45;
+const SLOTS = 7;
+let participants = [
+  {id:0,name:'MIMI',agency:'STARKSHIP ENT',year:'2010',image:null},
+  {id:1,name:'RENA',agency:'SM ENT',year:'2006',image:null},
+  {id:2,name:'LALITA',agency:'JYP ENT',year:'2003',image:null},
+  {id:3,name:'AGUSTINA',agency:'CUBE ENT',year:'2006',image:null},
+  {id:4,name:'LUCIA',agency:'BELIFT LAB',year:'2008',image:null},
+  {id:5,name:'RENE',agency:'WM ENT',year:'2004',image:null},
+  {id:6,name:'PATA',agency:'S2 ENT',year:'2004',image:null},
+  {id:7,name:'BRI',agency:'SOURCE MUSIC',year:'2008',image:null},
+  {id:8,name:'JOSI',agency:'SOURCE MUSIC',year:'2008',image:null},
+  {id:9,name:'MENIA',agency:'INDIVIDUAL',year:'2007',image:null},
+  {id:10,name:'LULU',agency:'KQ ENT',year:'2007',image:null},
+  {id:11,name:'ELA',agency:'HIGH UP ENT',year:'2007',image:null},
+  {id:12,name:'LYAH',agency:'STARSHIP ENT',year:'2002',image:null},
+  {id:13,name:'ZOWI',agency:'KOZ ENT',year:'2006',image:null},
+  {id:14,name:'MAI',agency:'BRAND NEW MUSIC',year:'2007',image:null},
+  {id:15,name:'VALENTINA',agency:'KAKAO ENT',year:'2004',image:null},
+  {id:16,name:'ALBA',agency:'YUEHUA ENT',year:'2004',image:null},
+  {id:17,name:'ISI',agency:'HYBE ENT',year:'2006',image:null},
+  {id:18,name:'LELE',agency:'RBW ENT',year:'2006',image:null},
+  {id:19,name:'YHAMI',agency:'IST ENT',year:'2007',image:null},
+  {id:20,name:'AGOS',agency:'TOP MEDIA ENT',year:'2007',image:null},
+  {id:21,name:'LEN',agency:'ADOR ENT',year:'2006',image:null},
+  {id:22,name:'KORY',agency:'PLEDIS ENT',year:'2005',image:null},
+  {id:23,name:'HANI',agency:'FANTAGIO ENT',year:'2006',image:null},
+  {id:24,name:'MATT',agency:'JELLYFISH ENT',year:'2005',image:null},
+  {id:25,name:'LEILA',agency:'DSP MEDIA',year:'2006',image:null},
+  {id:26,name:'COCO',agency:'INDIVIDUAL',year:'2005',image:null},
+  {id:27,name:'JOJO',agency:'HYBE ENT',year:'2004',image:null},
+  {id:28,name:'SARIEL',agency:'143 ENT',year:'2008',image:null},
+  {id:29,name:'KAMI',agency:'KOZ ENT',year:'2009',image:null},
+  {id:30,name:'KAT',agency:'PLAY M ENT',year:'2008',image:null},
+  {id:31,name:'RORO',agency:'8D ENT',year:'2005',image:null},
+  {id:32,name:'MAR',agency:'WOOLLIM ENT',year:'2006',image:null},
+  {id:33,name:'NANA',agency:'J PLANET ENT',year:'2004',image:null},
+  {id:34,name:'ANI',agency:'MNH ENT',year:'2009',image:null},
+  {id:35,name:'REBZ',agency:'LOEN ENT',year:'2007',image:null},
+  {id:36,name:'HACHI',agency:'FANTAGIO ENT',year:'2008',image:null},
+  {id:37,name:'CORI',agency:'8D ENT',year:'2006',image:null},
+  {id:38,name:'NICOLE',agency:'WOOLLIM ENT',year:'2000',image:null},
+  {id:39,name:'JUANA',agency:'MYSTIC STORY',year:'2008',image:null},
+  {id:40,name:'VALI',agency:'TSE ENT',year:'2007',image:null},
+  {id:41,name:'ARI',agency:'POCKETDOL STUDIO',year:'2007',image:null},
+  {id:42,name:'YUDANIS',agency:'ALLIGATOR COMPANY',year:'2006',image:null},
+  {id:43,name:'JOSEFA',agency:'DR MUSIC',year:'2005',image:null},
+  {id:44,name:'VALSI',agency:'CORIDEL ENT',year:'2005',image:null}
+];
+let slots = Array(SLOTS).fill(null);
+
+function defaultSvg(n){
+  return `<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><rect width='100%' height='100%' rx='100' fill='%23eef4f8'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-size='40' fill='%236b7b8d' font-family='Arial' font-weight='700'>${n}</text></svg>`;
+}
+
+function renderList(filter=''){
+  const list = document.getElementById('list'); list.innerHTML='';
+  participants.forEach((p,i)=>{
+    const q = (p.name||'').toLowerCase();
+    if(filter && !q.includes(filter.toLowerCase())) return;
+    const row = document.createElement('div'); row.className='part'; row.draggable=true; row.dataset.index=i; row.addEventListener('dragstart',onDragStart);
+
+    const av = document.createElement('div'); av.className='avatar';
+    const img = document.createElement('img'); img.alt=''; img.src = p.image || ('data:image/svg+xml;utf8,'+encodeURIComponent(defaultSvg(i+1))); av.appendChild(img);
+    av.addEventListener('click',()=>uploadImage(i));
+
+    const info = document.createElement('div'); info.className='info';
+    const name = document.createElement('div'); name.className='name'; name.contentEditable=true; name.innerText = p.name;
+    name.addEventListener('input',()=>{ participants[i].name = name.innerText; saveLocal(); renderSlots(); });
+    const meta = document.createElement('div'); meta.className='meta'; meta.contentEditable=true; meta.innerText = (p.agency? p.agency + ' • ' + p.year : '');
+    meta.addEventListener('input',()=>{ const parts = meta.innerText.split('•').map(s=>s.trim()); participants[i].agency = parts[0]||''; participants[i].year = parts[1]||''; saveLocal(); });
+
+    info.appendChild(name); info.appendChild(meta);
+    const drag = document.createElement('div'); drag.className='drag-handle'; drag.innerText='☰';
+
+    row.appendChild(av); row.appendChild(info); row.appendChild(drag);
+    list.appendChild(row);
+  });
+}
+
+function renderSlots(){
+  document.querySelectorAll('.slot').forEach(el=>{
+    const idx = parseInt(el.dataset.slot)-1; el.innerHTML=''; el.addEventListener('dragover',onDragOver); el.addEventListener('drop',onDrop); el.addEventListener('click',()=>promptAssign(idx));
+    if(slots[idx]!==null){ const p = participants[slots[idx]]; const img = document.createElement('img'); img.src = p.image || ('data:image/svg+xml;utf8,'+encodeURIComponent(defaultSvg(p.id+1))); el.appendChild(img); }
+    const num = document.createElement('div'); num.className='num'; num.innerText = idx+1; el.appendChild(num);
+  });
+}
+
+function onDragStart(e){ e.dataTransfer.setData('text/plain', e.currentTarget.dataset.index); }
+function onDragOver(e){ e.preventDefault(); }
+function onDrop(e){ e.preventDefault(); const partIndex = parseInt(e.dataTransfer.getData('text/plain')); const slotIndex = parseInt(e.currentTarget.dataset.slot)-1; assignToSlot(partIndex, slotIndex); }
+
+function assignToSlot(partIndex,slotIndex){ slots = slots.map(s => s===partIndex?null:s); slots[slotIndex] = partIndex; saveLocal(); renderSlots(); renderList(); }
+
+function promptAssign(slotIndex){ const listNames = participants.map((p,i)=>`${i+1}. ${p.name||('Participante '+(i+1))}`).join('\n'); const ans = prompt('Asignar participante al puesto '+(slotIndex+1)+"\n\nEscribe el número del participante:\n\n"+listNames); const n = parseInt(ans)-1; if(!isNaN(n) && n>=0 && n<TOTAL) assignToSlot(n,slotIndex); }
+
+function uploadImage(i){ const input = document.getElementById('imgUpload'); input.onchange = function(evt){ const f = evt.target.files[0]; if(!f) return; const reader = new FileReader(); reader.onload = function(ev){ participants[i].image = ev.target.result; saveLocal(); renderList(); renderSlots(); input.value=''; } reader.readAsDataURL(f); } input.click(); }
+
+function saveLocal(){ localStorage.setItem('ranker_blue_v1', JSON.stringify({participants, slots})); }
+
+function resetAll(){ if(!confirm('Restablecer plantilla (se perderá lo guardado localmente)?')) return; participants = participants.map((p,i)=>({id:i,name:p.name,agency:p.agency,year:p.year,image:null})); slots = Array(SLOTS).fill(null); saveLocal(); renderList(); renderSlots(); }
+
+function clearImages(){ if(!confirm('Borrar todas las imágenes?')) return; participants.forEach(p=>p.image=null); saveLocal(); renderList(); renderSlots(); }
+
+function exportJSON(){ const data = {participants, slots}; const blob = new Blob([JSON.stringify(data, null, 2)],{type:'application/json'}); const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='ranker_export_blue.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); }
+
+function importJSONFile(file){ const reader = new FileReader(); reader.onload = function(e){ try{ const data = JSON.parse(e.target.result); if(!data.participants) throw new Error('Formato inválido'); participants = data.participants.slice(0,TOTAL); while(participants.length<TOTAL) participants.push({id:participants.length,name:'',agency:'',year:'',image:null}); slots = (data.slots||[]).slice(0,SLOTS); while(slots.length<SLOTS) slots.push(null); saveLocal(); renderList(); renderSlots(); alert('Importado correctamente'); }catch(err){ alert('Error al importar: '+err.message); } } reader.readAsText(file); }
+
+// events
+document.getElementById('search').addEventListener('input',(e)=>renderList(e.target.value));
+document.getElementById('resetBtn').addEventListener('click',resetAll);
+document.getElementById('clearImages').addEventListener('click',clearImages);
+document.getElementById('saveBtn').addEventListener('click',()=>{ saveLocal(); alert('Guardado localmente.'); });
+document.getElementById('exportBtn').addEventListener('click',exportJSON);
+document.getElementById('importBtn').addEventListener('click',()=>document.getElementById('importFile').click());
+document.getElementById('importFile').addEventListener('change',(e)=>{ if(e.target.files[0]) importJSONFile(e.target.files[0]); });
+
+// init load local if exists
+(function init(){ const saved = localStorage.getItem('ranker_blue_v1'); if(saved){ try{ const obj = JSON.parse(saved); if(obj.participants) participants = obj.participants.slice(0,TOTAL); if(obj.slots) slots = obj.slots.slice(0,SLOTS); }catch(e){ console.warn('load failed'); } }
+ renderList(); renderSlots(); })();
+
+</script>
+</body>
+</html>

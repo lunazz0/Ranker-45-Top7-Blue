@@ -1,1 +1,0 @@
-# Ranker-45-Top7-Blue
